@@ -1,7 +1,7 @@
 package com.muhammet;
-import java.util.List;
-import java.util.Optional;
-import java.util.TreeSet;
+import com.sun.source.tree.Tree;
+
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -157,6 +157,127 @@ public class Runner {
 
         System.out.println("Ütü".length());
 
+        /**
+         * Bir liste içinde tekrar eden kayıtların gösterilmesi istenmiyor ise distinct kullanılır.
+         * -> String,Integer, gibi tekli veri tutan tipleri kullanmak anlamalı iken,
+         * Sınıf tipinde ve içinde bir çok alanı barındıran nesneleri kullandığımızda işler karışıyor gibi
+         * görüne bilir, burada iki nesnenin bire bir aynı olması gerektiğini unutmayınız.
+         * user1 -> {id:1, name: "Mehmet", surname: "Yılmaz"}
+         * user2-> {id:1, name: "Mehmet", surname: "Yılmaz"}
+         * user3 -> {id:2, name: "Mehmet", surname: "Yılmaz"}
+         * user1=user2 -> bunu tekil hale getirir.
+         * user1=user3 -> bunu tekil hale getirmez.
+         */
+        Stream<String> musteriListesi = Stream.of("Ali","Deniz","Bahar","Gümüş","Ali","Deniz","Bekir");
+        musteriListesi.distinct().forEach(System.out::println);
+        /**
+         * limit, sonsuz döngülerde işlemin kısıtlı kalmasını sağlamak içni kullanılır.
+         * döngü sayısını belirtir.
+         * skip, fonksiyonun belli mikatardaki adımlarını atlayarak devam etmesini sağlar.
+         * 1. adım -> ilk adımda fonksiyonun sonsuza gittiğini düşünelim. -> 5,10,20,40,80,160,320,640,1280....
+         * 2. adım-> limit(6)-> 5,10,20,40,80,160
+         * 3. adım -> skip(2) -> 20,40,80,160
+         * 4. adım-> limit(3) -> 20,40,80
+         */
+        Stream<Integer> sayilarI = Stream.iterate(5, s -> s*2);
+        sayilarI.limit(6).skip(2).limit(3).forEach(System.out::println);
+
+        /**
+         * Mapping
+         * Elimizde, bir firmanın günlük ürün satışları ile ilgili bigiler olsuın.
+         * A ürünü -> List<Satis> satış listesi şeklinde bilgiler olsun.
+         */
+        Stream<String> sehirler = Stream.of("Ankara","İstanbul", "İzmit", "Bursa", "Denizli");
+        sehirler.map(String::length).forEach(System.out::println);
+
+        List<Urun> AurunSatisListesi = Arrays.asList(new Urun(), new Urun(), new Urun());
+        List<Urun> BurunSatisListesi = Arrays.asList(new Urun());
+        List<Urun> CurunSatisListesi = Arrays.asList(new Urun(), new Urun(), new Urun(), new Urun());
+
+        Stream<List<Urun>> urunListesi = Stream.of(AurunSatisListesi,BurunSatisListesi, CurunSatisListesi);
+        urunListesi.map(List::size).forEach(System.out::println);
+
+        /**
+         * Sorting
+         * bir liste içinde belli özelliklere göre sıralama işlemler yapabiliriz.
+         * sorted() -> a...Z, 0...9
+         * sorted(Comparator.reverseOrder()) -> Z...a, 9...0
+         */
+        Stream<String> isimListesi = Stream.of("Canan","Zeynep","Gümüş","Eren","Ayşe","Tekin");
+        isimListesi.sorted().forEach(System.out::println);
+        isimListesi = Stream.of("Canan","Zeynep","Gümüş","Eren","Ayşe","Tekin");
+        isimListesi.sorted(Comparator.reverseOrder()).forEach(System.out::println);
+
+        /**
+         *  Stream -> Collecting Results
+         *
+         */
+
+        System.out.println("******* Collecting Results *********");
+        System.out.println();
+        /**
+         * var nedir?
+         * var -> Java 10 ile birlikte gelen bir değişken tipi tanımlama yöntemidir.
+         * var temel olarak herhangi bir tip almaz. siz bu değişken türüne hangi
+         * atamayı yaparsanız o türe dönüşür.
+         */
+        var sayiiii = 45;
+        var ifade = "ifade";
+        var olduMu = true;
+        var sayiListesi = Arrays.asList(1,2,3,4,5,6,7,8,9,10);
+
+        var gunListesi = Stream.of("Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar");
+        String sGunler = gunListesi.collect(Collectors.joining("-"));
+        System.out.println(sGunler);
+
+        gunListesi = Stream.of("Pazartesi","Sali","Carsamba","Persembe","Cuma","Cumartesi","Pazar");
+        Double dGublerAvg = gunListesi.collect(Collectors.averagingDouble(String::length));
+        System.out.println("Günlerin ortalama uzunluğu.....: "+dGublerAvg);
+
+        gunListesi = Stream.of("Pazartesi","Sali","Carsamba","Persembe","Cuma","Cumartesi","Pazar");
+        TreeSet<String> tsGunler = gunListesi
+                .filter(g-> g.startsWith("C"))
+                .collect(Collectors.toCollection(TreeSet::new));
+        System.out.println("C ile başlayan günler....: "+tsGunler);
+        /**
+         * Map<GününAdı,Uzunluğu> -> Salı->4
+         */
+        gunListesi = Stream.of("Pazartesi","Sali","Carsamba","Persembe","Cuma","Cumartesi","Pazar");
+        Map<String,Integer> mapGunler =
+                gunListesi.collect(Collectors.toMap(g-> g, String::length));
+        //  gunListesi.collect(Collectors.toMap(g-> g, g-> g.startsWith("C") ? g.length() : 0));
+        System.out.println("Günlerin uzunlukları....: "+mapGunler);// {pazartesi=9, sali=4, carsamba=8, persembe=8, cuma=4, cumartesi=9, pazar=5}
+        /**
+         * Key-> Value
+         * 4 =["salı","cuma"]
+         * 5 =["pazar"]
+         * 8 =["carsamba","perşembe"]
+         */
+        gunListesi = Stream.of("Pazartesi","Sali","Carsamba","Persembe","Cuma","Cumartesi","Pazar");
+        Map<Integer,List<String>> mapListGunler =
+                gunListesi.collect(Collectors.groupingBy(String::length));
+        System.out.println("Günlerin uzunlukları....: "+mapListGunler);// {4=[sali, cuma], 5=[pazar], 8=[carsamba, persembe], 9=[pazartesi, cumartesi]}
+
+        var urunList =
+                Stream.of(new Urun("A Marka","Seker"),
+                          new Urun("A Marka","Un"),
+                        new Urun("B Marka","Yağ"),
+                        new Urun("C Marka","Çikolata")
+                        );
+        Map<String,List<Urun>> markaGrupListesi =
+                urunList.collect(Collectors.groupingBy(Urun::getMarka));
+        System.out.println("Marka Grup Listesi....: "+markaGrupListesi);
+
+        gunListesi = Stream.of("Pazartesi","Sali","Carsamba","Persembe","Cuma","Cumartesi","Pazar");
+        TreeMap<String,List<String>> glist =
+                gunListesi.collect(
+                        Collectors.groupingBy(
+                                g-> g.substring(0,1),
+                                TreeMap::new,
+                                Collectors.toList()
+                        )
+                );
+        System.out.println("Günlerin uzunlukları....: "+glist);
 
     }
 
