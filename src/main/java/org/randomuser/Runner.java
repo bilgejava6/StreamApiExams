@@ -13,7 +13,7 @@ public class Runner {
         System.out.println("***** KULLANICI DATALARI ***********");
         System.out.println("işlem başladı....");
         Scanner sc = null;
-        sc = new Scanner(new URL("https://randomuser.me/api/?results=500").openStream(),"UTF-8");
+        sc = new Scanner(new URL("https://randomuser.me/api/?results=1000").openStream(),"UTF-8");
         StringBuilder sb = new StringBuilder();
         String row;
         while (sc.hasNext()){
@@ -44,7 +44,18 @@ public class Runner {
             kullaniciListesi.add(person);
         }
 
-        kullaniciListesi.forEach(System.out::println);
+       // kullaniciListesi.forEach(System.out::println);
+
+        /**
+         * Canada da oturanları listele
+         */
+//        kullaniciListesi.stream()
+//                .filter(x-> x.getLocation().getCountry().equals("Canada"))
+//                .forEach(System.out::println);
+        /**
+         * yaşı 20 ile 45 arasında olan kadınların listesini getir.
+         */
+
 
 
     }

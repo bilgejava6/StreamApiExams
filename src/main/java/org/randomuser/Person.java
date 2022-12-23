@@ -7,10 +7,39 @@ public class Person implements Serializable {
     String email;
     String phone;
     String nat;
-
     Name name;
-
     Location location;
+    Dob dob;
+    public static class Dob{
+        Integer age;
+
+        public Dob() {
+        }
+
+        public Integer getAge() {
+            return age;
+        }
+
+        public void setAge(Integer age) {
+            this.age = age;
+        }
+    }
+    public Name getName() {
+        return name;
+    }
+
+    public void setName(Name name) {
+        this.name = name;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
     public static class Location{
         String country;
         String state;
@@ -78,6 +107,8 @@ public class Person implements Serializable {
                 ", phone='" + phone + '\'' +
                 ", nat='" + nat + '\'' +
                 ", location='" + location.getCountry() + '\'' +
+                ", yas='" + dob.getAge() + '\'' +
+
                 '}';
     }
 
